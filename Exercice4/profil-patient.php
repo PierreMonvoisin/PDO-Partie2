@@ -5,7 +5,7 @@ $patientLastName = '';
 if (!empty($_GET['patient'])) {
   $patientLastName = $_GET['patient'];
 }
-$query = 'SELECT `firstname`, `lastname`, `birthdate`, `phone`, `mail` FROM `patients` WHERE `lastname` = "' . $patientLastName . '"';
+$query = 'SELECT `firstname`, `lastname`, DATE_FORMAT(`birthDate`,\'%d-%m-%Y\') `birthdate`, `phone`, `mail` FROM `patients` WHERE `lastname` = "' . $patientLastName . '"';
 $patientInfoQuery = $database->query($query);
 $patientInfo = $patientInfoQuery->fetchAll(PDO::FETCH_ASSOC);
 ?>
@@ -61,18 +61,18 @@ $patientInfo = $patientInfoQuery->fetchAll(PDO::FETCH_ASSOC);
                     <th>Date de naissance</th>
                     <th>Téléphone portable</th>
                     <th>Adresse mail</th>
-                    <th>Modification</th>
+                    <th>Validation</th>
                 </tr>
                 </thead>
                 <tbody>
                 <tr id="modification">
                     <td>
                       <label class="sr-only" for="lastname">Nom de famille</label>
-                      <input name="lastname" type="text" class="form-control" id="lastname" placeholder="Doe">
+                      <input name="lastname" type="text" class="form-control" id="lastname" placeholder="<?= $patient['lastname'] ?>">
                     </td>
                     <td>
                       <label class="sr-only" for="firstname">Prénom</label>
-                      <input name="firstname" type="text" class="form-control" id="firstname" placeholder="John">
+                      <input name="firstname" type="text" class="form-control" id="firstname" placeholder="<?= $patient['firstname'] ?>">
                     </td>
                     <td>
                       <label class="sr-only" for="birthdate">Date de naissance</label>
@@ -80,11 +80,11 @@ $patientInfo = $patientInfoQuery->fetchAll(PDO::FETCH_ASSOC);
                     </td>
                     <td>
                       <label class="sr-only" for="phoneNumber">Numéro de téléphone</label>
-                      <input name="phoneNumber" type="text" class="form-control" id="phoneNumber" placeholder="06.11.22.33.44">
+                      <input name="phoneNumber" type="text" class="form-control" id="phoneNumber" placeholder="<?= $patient['phone'] ?>">
                     </td>
                     <td>
                       <label class="sr-only" for="Email"></label>
-                      <input name="Email" type="email" class="form-control" id="Email" placeholder="john.doe@gmail.com">
+                      <input name="Email" type="email" class="form-control" id="Email" placeholder="<?= $patient['mail'] ?>">
                     </td>
                     <td>
                       <button name="submit" type="submit" class="btn btn-danger">Confirmer</button>
