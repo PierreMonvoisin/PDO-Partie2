@@ -66,13 +66,29 @@ $patientInfo = $patientInfoQuery->fetchAll(PDO::FETCH_ASSOC);
                 </thead>
                 <tbody>
                 <tr id="modification">
-                    <td><input name="lastname" type="text" class="form-control" id="lastname" placeholder="Doe"></td>
-                    <td><input name="firstname" type="text" class="form-control" id="firstname" placeholder="John"></td>
-                    <td><input name="birthdate" type="date" class="form-control" id="birthdate"></td>
-                    <td><input name="phoneNumber" type="text" class="form-control" id="phoneNumber"
-                               placeholder="06.11.22.33.44"></td>
-                    <td><input name="Email" type="email" class="form-control" id="Email" placeholder="john.doe@gmail.com"></td>
-                    <td><button name="submit" type="submit" class="btn btn-danger">Confirmer</button></td>
+                    <td>
+                      <label class="sr-only" for="lastname">Nom de famille</label>
+                      <input name="lastname" type="text" class="form-control" id="lastname" placeholder="Doe">
+                    </td>
+                    <td>
+                      <label class="sr-only" for="firstname">Prénom</label>
+                      <input name="firstname" type="text" class="form-control" id="firstname" placeholder="John">
+                    </td>
+                    <td>
+                      <label class="sr-only" for="birthdate">Date de naissance</label>
+                      <input name="birthdate" type="date" class="form-control" id="birthdate">
+                    </td>
+                    <td>
+                      <label class="sr-only" for="phoneNumber">Numéro de téléphone</label>
+                      <input name="phoneNumber" type="text" class="form-control" id="phoneNumber" placeholder="06.11.22.33.44">
+                    </td>
+                    <td>
+                      <label class="sr-only" for="Email"></label>
+                      <input name="Email" type="email" class="form-control" id="Email" placeholder="john.doe@gmail.com">
+                    </td>
+                    <td>
+                      <button name="submit" type="submit" class="btn btn-danger">Confirmer</button>
+                    </td>
                 </tr>
                 </tbody>
             </table>
