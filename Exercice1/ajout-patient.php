@@ -29,10 +29,14 @@ if (isset($_GET['submit']) && $_SERVER['REQUEST_METHOD'] === 'GET') {
 //    var_dump($validatedInputs);
   }
   if ($formValidity === true) {
-    $queryValuesString = "'" .implode("', '", $validatedInputs). "'";
+    $stmtParam = $validatedInputs;
     try {
-      $query = "INSERT INTO `patients` (`firstname`,`lastname`,`birthdate`,`phone`,`mail`) VALUES ($queryValuesString)";
-      $database->exec($query);
+      $stmt = $database->prepare('INSERT INTO `patients` (`firstname`,`lastname`,`birthdate`,`phone`,`mail`) VALUES (?, ?, ?, ?, ?)');
+      $stmt->execute([$stmtParam['firstname'], $stmtParam['lastname'], $stmtParam['birthdate'], $stmtParam['phoneNumber'], $stmtParam['Email']]);
+      $stmt = null;
+//      A ne pas utiliser, même si c'est plus simple
+//      $query = "INSERT INTO `patients` (`firstname`,`lastname`,`birthdate`,`phone`,`mail`) VALUES ($queryValuesString)";
+//      $database->exec($query);
     } catch(PDOException $e) {
       echo $$query. '/' .$e->getMessage();
     }
