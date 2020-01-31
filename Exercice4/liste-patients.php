@@ -11,7 +11,6 @@ $patientsList = $patientsListQuery->fetchAll(PDO::FETCH_ASSOC); ?>
 <!DOCTYPE html>
 <html lang="fr" dir="ltr">
 <head>
-    <!-- ³ = alt + 0179 -->
     <title>PDO-Partie2</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">

@@ -11,10 +11,10 @@ $formValidity = false;
 if (isset($_GET['submit']) && $_SERVER['REQUEST_METHOD'] === 'GET') {
   foreach ($_GET as $key => $value) {
     if ($value === '' || $value === null) {
-        // Change le message si une valeur est vide
+      // Change le message si une valeur est vide
       $submitMessage = 'Un des champs est érroné ...';
     } else {
-        // Nettoie toutes les valeurs
+      // Nettoie toutes les valeurs
       $sanitizedInputs[$key] = sanitizeString($key, $value);
       // Envoie le tableau des valeurs pour le valider
       if (count($sanitizedInputs) === 5) {
@@ -30,24 +30,22 @@ if (isset($_GET['submit']) && $_SERVER['REQUEST_METHOD'] === 'GET') {
   } else {
     $submitMessage = 'Vous êtes bien enregistré !';
     $formValidity = true;
-//    echo 'validatedInputs = ';
-//    var_dump($validatedInputs);
   }
   if ($formValidity === true) {
-      // Change le nom de la variable pour une meilleure compréhension
+    // Change le nom de la variable pour une meilleure compréhension
     $stmtParam = $validatedInputs;
     try {
-        // Déclaration de la requête SQL avec paramètres
+      // Déclaration de la requête SQL avec paramètres
       $stmt = $database->prepare('INSERT INTO `patients` (`firstname`,`lastname`,`birthdate`,`phone`,`mail`) VALUES (?, ?, ?, ?, ?)');
       // Execute la requête avec les variables en paramètres
       $stmt->execute([$stmtParam['firstname'], $stmtParam['lastname'], $stmtParam['birthdate'], $stmtParam['phoneNumber'], $stmtParam['Email']]);
       // Réinitialise la requête
       $stmt = null;
-//      A ne pas utiliser, même si c'est plus simple
-//      $query = "INSERT INTO `patients` (`firstname`,`lastname`,`birthdate`,`phone`,`mail`) VALUES ($queryValuesString)";
-//      $database->exec($query);
-    } catch(PDOException $e) {
-      echo $$query. '/' .$e->getMessage();
+      // A ne pas utiliser, même si c'est plus simple
+      // $query = "INSERT INTO `patients` (`firstname`,`lastname`,`birthdate`,`phone`,`mail`) VALUES ($queryValuesString)";
+      // $database->exec($query);
+    } catch (PDOException $e) {
+      echo $$query . '/' . $e->getMessage();
     }
   }
 }
@@ -68,7 +66,7 @@ if (isset($_GET['submit']) && $_SERVER['REQUEST_METHOD'] === 'GET') {
 <div class="jumbotron pt-4 my-5 mx-auto w-50">
     <h2 class="text-center">Formulaire d'inscription</h2>
   <?php if (isset($_GET['submit'])) { ?>
-<!--   Ajoute un message à l'envoi du formulaire-->
+      <!--   Ajoute un message à l'envoi du formulaire-->
       <h3 class="text-center"><?= $submitMessage ?></h3>
   <?php } ?>
     <form action="ajout-patient.php" method="get" autocomplete="on">
