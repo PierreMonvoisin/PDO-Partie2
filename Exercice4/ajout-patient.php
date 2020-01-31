@@ -1,18 +1,22 @@
 <?php
+// Connection à la base de données
 require_once 'connection.php';
 $database = connectionToDatabase();
-
+// Importe les fonctions de nettoyage et validation des valeurs
 include 'input-cleaning.php';
 $submitMessage = 'Vous êtes bien enregistré !';
 $validatedInputs = 'ERROR';
 $formValidity = false;
+// Récupère les valeurs du formulaire à l'envoi
 if (isset($_GET['submit']) && $_SERVER['REQUEST_METHOD'] === 'GET') {
-  $formValidity = false;
   foreach ($_GET as $key => $value) {
     if ($value === '' || $value === null) {
+        // Change le message si une valeur est vide
       $submitMessage = 'Un des champs est érroné ...';
     } else {
+        // Nettoie toutes les valeurs
       $sanitizedInputs[$key] = sanitizeString($key, $value);
+      // Envoie le tableau des valeurs pour le valider
       if (count($sanitizedInputs) === 5) {
         $validatedInputs = validateString($sanitizedInputs);
       } else {
@@ -20,6 +24,7 @@ if (isset($_GET['submit']) && $_SERVER['REQUEST_METHOD'] === 'GET') {
       }
     }
   }
+  // Si toutes les valeurs sont bonnes, valide l'envoi
   if (in_array(null, $validatedInputs, true)) {
     $submitMessage = 'Un des champs est érroné ...';
   } else {
@@ -29,10 +34,14 @@ if (isset($_GET['submit']) && $_SERVER['REQUEST_METHOD'] === 'GET') {
 //    var_dump($validatedInputs);
   }
   if ($formValidity === true) {
+      // Change le nom de la variable pour une meilleure compréhension
     $stmtParam = $validatedInputs;
     try {
+        // Déclaration de la requête SQL avec paramètres
       $stmt = $database->prepare('INSERT INTO `patients` (`firstname`,`lastname`,`birthdate`,`phone`,`mail`) VALUES (?, ?, ?, ?, ?)');
+      // Execute la requête avec les variables en paramètres
       $stmt->execute([$stmtParam['firstname'], $stmtParam['lastname'], $stmtParam['birthdate'], $stmtParam['phoneNumber'], $stmtParam['Email']]);
+      // Réinitialise la requête
       $stmt = null;
 //      A ne pas utiliser, même si c'est plus simple
 //      $query = "INSERT INTO `patients` (`firstname`,`lastname`,`birthdate`,`phone`,`mail`) VALUES ($queryValuesString)";
@@ -46,7 +55,6 @@ if (isset($_GET['submit']) && $_SERVER['REQUEST_METHOD'] === 'GET') {
 <!DOCTYPE html>
 <html lang="fr" dir="ltr">
 <head>
-    <!-- ³ = alt + 0179 -->
     <title>PDO-Partie2</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -60,6 +68,7 @@ if (isset($_GET['submit']) && $_SERVER['REQUEST_METHOD'] === 'GET') {
 <div class="jumbotron pt-4 my-5 mx-auto w-50">
     <h2 class="text-center">Formulaire d'inscription</h2>
   <?php if (isset($_GET['submit'])) { ?>
+<!--   Ajoute un message à l'envoi du formulaire-->
       <h3 class="text-center"><?= $submitMessage ?></h3>
   <?php } ?>
     <form action="ajout-patient.php" method="get" autocomplete="on">

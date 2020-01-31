@@ -1,13 +1,10 @@
 <?php
+// Connection à la base de données
 require_once 'connection.php';
-$database = connectionToDatabase();
-// $query = 'SELECT * FROM `patients`';
-// $dataListQuery = $database->query($query);
-// $dataList = $dataListQuery->fetchAll(PDO::FETCH_ASSOC); ?>
+$database = connectionToDatabase(); ?>
 <!DOCTYPE html>
 <html lang="fr" dir="ltr">
 <head>
-  <!-- ³ = alt + 0179 -->
   <title>PDO-Partie2</title>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">

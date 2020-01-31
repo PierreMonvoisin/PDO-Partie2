@@ -1,12 +1,17 @@
 <?php
+// Connection à la base de données
 require_once 'connection.php';
 $database = connectionToDatabase();
+// Récupération du nom du patient avec la méthode GET
 $patientLastName = '';
 if (!empty($_GET['patient'])) {
   $patientLastName = $_GET['patient'];
 }
+// Déclaration de la requête SQL associée au nom du patient
 $query = 'SELECT `firstname`, `lastname`, DATE_FORMAT(`birthDate`,\'%d-%m-%Y\') `birthdate`, `phone`, `mail` FROM `patients` WHERE `lastname` = "' . $patientLastName . '"';
+// Envoie de la requête vers la base de données
 $patientInfoQuery = $database->query($query);
+// Collection des données dans un tableau associatif (FETCH_ASSOC)
 $patientInfo = $patientInfoQuery->fetchAll(PDO::FETCH_ASSOC);
 ?>
 <!DOCTYPE html>
@@ -37,12 +42,14 @@ $patientInfo = $patientInfoQuery->fetchAll(PDO::FETCH_ASSOC);
         </thead>
         <tbody>
         <?php foreach ($patientInfo as $patient) { ?>
+<!--         Affichage de toutes les données du patient-->
             <tr id="<?= $patient['lastname'] ?>">
                 <td><?= $patient['lastname'] ?></td>
                 <td><?= $patient['firstname'] ?></td>
                 <td><?= $patient['birthdate'] ?></td>
                 <td><?= $patient['phone'] ?></td>
                 <td><?= $patient['mail'] ?></td>
+<!--                Ajoute un lien pour modifier les données du patient-->
                 <td><a href="profil-patient.php?patient=<?= $patientLastName ?>&modify=on"
                        class="text-white">Modifier</a></td>
             </tr>
@@ -50,6 +57,7 @@ $patientInfo = $patientInfoQuery->fetchAll(PDO::FETCH_ASSOC);
         </tbody>
     </table>
 </div>
+<!--Au clique du bouton, afficher le jumbotron avec le formulaire pour modifier les données-->
 <?php if (!empty($_GET['modify']) && $_GET['modify'] === 'on') { ?>
     <div class="jumbotron pt-4 my-5 bg-primary mx-auto">
         <form action="profil-patient.php?patient=<?= $patientLastName ?>" method="POST">

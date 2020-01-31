@@ -1,10 +1,13 @@
 <?php
+// Connection à la base de données
 require_once 'connection.php';
 $database = connectionToDatabase();
+// Déclaration de la requête SQL pour afficher les noms et prénoms des clients
 $query = 'SELECT `firstname`, `lastname` FROM `patients` ORDER BY `lastname` ASC';
+// Envoie de la requête vers la base de données
 $patientsListQuery = $database->query($query);
-$patientsList = $patientsListQuery->fetchAll(PDO::FETCH_ASSOC);
-?>
+// Collection des données dans un tableau associatif (FETCH_ASSOC)
+$patientsList = $patientsListQuery->fetchAll(PDO::FETCH_ASSOC); ?>
 <!DOCTYPE html>
 <html lang="fr" dir="ltr">
 <head>
@@ -30,10 +33,12 @@ $patientsList = $patientsListQuery->fetchAll(PDO::FETCH_ASSOC);
         </tr>
         </thead>
         <tbody>
-        <?php foreach ($patientsList as $patient) {?>
+        <?php foreach ($patientsList as $patient) { ?>
+<!--         Pour chaque client, créer une ligne avec leurs informations et un bouton associé pour afficher leur profil-->
         <tr id="<?= $patient['lastname'] ?>">
             <td><?= $patient['lastname'] ?></td>
             <td><?= $patient['firstname'] ?></td>
+<!--            Ajoute un lien vers le profil du patient-->
             <td><a href="profil-patient.php?patient=<?= $patient['lastname'] ?>" class="text-white">Afficher</a></td>
         </tr>
         <?php } ?>
