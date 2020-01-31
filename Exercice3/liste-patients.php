@@ -26,6 +26,7 @@ $patientsList = $patientsListQuery->fetchAll(PDO::FETCH_ASSOC);
         <tr class="text-white">
             <th>Nom de famille</th>
             <th>Prénom</th>
+            <th>Profil</th>
         </tr>
         </thead>
         <tbody>
@@ -33,6 +34,7 @@ $patientsList = $patientsListQuery->fetchAll(PDO::FETCH_ASSOC);
         <tr id="<?= $patient['lastname'] ?>">
             <td><?= $patient['lastname'] ?></td>
             <td><?= $patient['firstname'] ?></td>
+            <td><a href="profil-patient.php?patient=<?= $patient['lastname'] ?>" class="text-white">Afficher</a></td>
         </tr>
         <?php } ?>
         </tbody>
