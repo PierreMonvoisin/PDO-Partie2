@@ -28,7 +28,6 @@ if (isset($_GET['submit']) && $_SERVER['REQUEST_METHOD'] === 'GET') {
   if (in_array(null, $validatedInputs, true)) {
     $submitMessage = 'Un des champs est érroné ...';
   } else {
-    $submitMessage = 'Vous êtes bien enregistré !';
     $formValidity = true;
   }
   if ($formValidity === true) {
@@ -41,6 +40,7 @@ if (isset($_GET['submit']) && $_SERVER['REQUEST_METHOD'] === 'GET') {
       $stmt->execute([$stmtParam['firstname'], $stmtParam['lastname'], $stmtParam['birthdate'], $stmtParam['phoneNumber'], $stmtParam['Email']]);
       // Réinitialise la requête
       $stmt = null;
+      $submitMessage = 'Vous êtes bien enregistré !';
       // A ne pas utiliser, même si c'est plus simple
       // $query = "INSERT INTO `patients` (`firstname`,`lastname`,`birthdate`,`phone`,`mail`) VALUES ($queryValuesString)";
       // $database->exec($query);

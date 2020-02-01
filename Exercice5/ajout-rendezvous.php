@@ -6,8 +6,55 @@ $database = connectionToDatabase();
 $query = 'SELECT `id`, `firstname`, `lastname` FROM `patients` ORDER BY `lastname` ASC';
 // Envoie de la requête vers la base de données
 $patientsListQuery = $database->query($query);
+// Importe les fonctions de nettoyage et validation des valeurs
+include 'input-cleaning-rendezvous.php';
+$submitMessage = 'ERROR';
+$appointmentRaw = 'ERROR';
+$appointmentSanitized = 'ERROR';
+$appointmentValidated = 'ERROR';
+$formValidity = false;
 // Collection des données dans un tableau associatif (FETCH_ASSOC)
-$patientsList = $patientsListQuery->fetchAll(PDO::FETCH_ASSOC); ?>
+$patientsList = $patientsListQuery->fetchAll(PDO::FETCH_ASSOC);
+if (isset($_GET['submit']) && $_SERVER['REQUEST_METHOD'] === 'GET') {
+  $patientId = $_GET['patient'];
+  $date = $_GET['year'] . '-' . $_GET['month'] . '-' . $_GET['day'];
+  $dateFrench = $_GET['day'] . '-' . $_GET['month'] . '-' . $_GET['year'];
+  $hour = $_GET['hour'];
+  $appointmentRaw = [$patientId, $date, $hour];
+  $appointmentSanitized = sanitizeString($appointmentRaw);
+  // Envoie le tableau des valeurs pour le valider
+  if (count($appointmentSanitized) === 3) {
+    $appointmentValidated = validateString($appointmentSanitized);
+  } else {
+    $submitMessage = 'Un des champs est érroné ...';
+  }
+  // Si toutes les valeurs sont bonnes, valide l'envoi
+  if (in_array(null, $appointmentValidated, true)) {
+    $submitMessage = 'Un des champs est érroné ...';
+  } else {
+    $formValidity = true;
+  }
+  if ($formValidity === true) {
+    // Concatène la date et les heures
+    $dateHourString = $appointmentValidated[1] . ' ' . $appointmentValidated[2];
+    // Déclare la date au format optimal pour SQL
+    $dateHour = date('Y-m-d H:i', strtotime($dateHourString));
+    // Réorganisation du tableau pour une meilleure utilisation
+    $stmtParam = ['dateHour' => $dateHour, 'idPatients' => $appointmentValidated[0]];
+    try {
+      // Déclaration de la requête SQL avec paramètres
+      $stmt = $database->prepare('INSERT INTO `appointments` (`dateHour`,`idPatients`) VALUES (?, ?)');
+      // Execute la requête avec les variables en paramètres
+      $stmt->execute([$stmtParam['dateHour'], $stmtParam['idPatients']]);
+      // Réinitialise la requête
+      $stmt = null;
+      $submitMessage = 'Rendez vous bien enregistré !';
+    } catch (PDOException $e) {
+      echo $$query . '/' . $e->getMessage();
+    }
+  }
+}
+?>
 <!DOCTYPE html>
 <html lang="fr" dir="ltr">
 <head>
@@ -24,6 +71,10 @@ $patientsList = $patientsListQuery->fetchAll(PDO::FETCH_ASSOC); ?>
 <div class="jumbotron pt-4 my-5 mx-auto bg-primary w-50 shadow">
     <div id="dateSelector">
         <h2 class="text-center text-white">Choississez la date du rendez vous</h2>
+      <?php if ($formValidity) { ?>
+          <!--   Ajoute un message à la validation du formulaire-->
+          <h3 class="text-center text-white"><?= $submitMessage ?></h3>
+      <?php } ?>
         <form class="form-group w-50 mx-auto" action="ajout-rendezvous.php" method="get">
             <div class="form-group row d-flex">
                 <label for="patient" class="mr-auto my-auto font-weight-bold text-white">Choisissez le patient :</label>
@@ -39,7 +90,8 @@ $patientsList = $patientsListQuery->fetchAll(PDO::FETCH_ASSOC); ?>
                 <select name="day" id="day" class="form-control w-50 ml-auto my-3">
                     <option disabled selected>-- Jour --</option>
                   <?php // Créer une liste de 1 à 31 pour le jour
-                  foreach (range(1, 31) as $day) { ?>
+                  foreach (range(1, 31) as $day) {
+                    $day < 10 ? $day = '0' . $day : $day; ?>
                       <option value="<?= $day ?>"><?= $day ?></option>
                   <?php } ?>
                 </select>
@@ -48,18 +100,18 @@ $patientsList = $patientsListQuery->fetchAll(PDO::FETCH_ASSOC); ?>
                 <label for="month" class="mr-auto my-auto font-weight-bold text-white">Choisissez le mois :</label>
                 <select name="month" id="month" class="form-control w-50 ml-auto my-3">
                     <option disabled selected>-- Mois --</option>
-                    <option value="January">Janvier</option>
-                    <option value="February">Février</option>
-                    <option value="March">Mars</option>
-                    <option value="April">Avril</option>
-                    <option value="May">Mai</option>
-                    <option value="June">Juin</option>
-                    <option value="July">Juillet</option>
-                    <option value="August">Août</option>
-                    <option value="September">Septembre</option>
-                    <option value="October">Octobre</option>
-                    <option value="November">Novembre</option>
-                    <option value="December">Décembre</option>
+                    <option value="01">Janvier</option>
+                    <option value="02">Février</option>
+                    <option value="03">Mars</option>
+                    <option value="04">Avril</option>
+                    <option value="05">Mai</option>
+                    <option value="06">Juin</option>
+                    <option value="07">Juillet</option>
+                    <option value="08">Août</option>
+                    <option value="09">Septembre</option>
+                    <option value="10">Octobre</option>
+                    <option value="11">Novembre</option>
+                    <option value="12">Décembre</option>
                 </select>
             </div>
             <div class="form-group row d-flex">
@@ -77,13 +129,14 @@ $patientsList = $patientsListQuery->fetchAll(PDO::FETCH_ASSOC); ?>
                 <select name="hour" id="hour" class="form-control w-50 ml-auto my-3">
                     <option disabled selected>-- Heure --</option>
                   <?php // Créer une liste de tous les crénaux horraire
-                  foreach (range(8, 19) as $hours) { ?>
+                  foreach (range(8, 19) as $hours) {
+                    $hours < 10 ? $hours = '0' . $hours : $hours; ?>
                       <option value="<?= $hours ?>:00"><?= $hours ?>:00</option>
                       <option value="<?= $hours ?>:30"><?= $hours ?>:30</option>
                   <?php } ?>
                 </select>
             </div>
-            <button type="submit" id="submitButton" class="btn btn-dark btn-block">Valider</button>
+            <button name="submit" type="submit" id="submitButton" class="btn btn-dark btn-block">Valider</button>
         </form>
     </div>
 </div>
