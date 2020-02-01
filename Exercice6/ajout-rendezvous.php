@@ -2,6 +2,7 @@
 // Connection à la base de données
 require_once 'connection.php';
 $database = connectionToDatabase();
+////////////////////////// EXERCICE 5 //////////////////////////
 // Déclaration de la requête SQL pour afficher les noms et prénoms des clients
 $query = 'SELECT `id`, `firstname`, `lastname` FROM `patients` ORDER BY `lastname` ASC';
 // Envoie de la requête vers la base de données
@@ -16,25 +17,31 @@ $formValidity = false;
 // Collection des données dans un tableau associatif (FETCH_ASSOC)
 $patientsList = $patientsListQuery->fetchAll(PDO::FETCH_ASSOC);
 if (isset($_GET['submit']) && $_SERVER['REQUEST_METHOD'] === 'GET') {
-  $patientId = $_GET['patient'];
-  $date = $_GET['year'] . '-' . $_GET['month'] . '-' . $_GET['day'];
-  $dateFrench = $_GET['day'] . '-' . $_GET['month'] . '-' . $_GET['year'];
-  $hour = $_GET['hour'];
+  empty($_GET['patient']) ? $patientId = null : $patientId = $_GET['patient'];
+  empty($_GET['year']) ||  empty($_GET['month']) || empty($_GET['day'])? $date = null : $date = $_GET['year'] . '-' . $_GET['month'] . '-' . $_GET['day'];
+  empty($_GET['year']) ||  empty($_GET['month']) || empty($_GET['day'])? $dateFrench = null :
+   $dateFrench = $_GET['day'] . '-' . $_GET['month'] . '-' . $_GET['year'];
+  empty($_GET['hour']) ? $hour = null : $hour = $_GET['hour'];
   $appointmentRaw = [$patientId, $date, $hour];
-  $appointmentSanitized = sanitizeString($appointmentRaw);
+  // Envoie le tableau des valeurs pour le nettoyer
+  if (! in_array(null, $appointmentRaw, true)) {
+    $appointmentSanitized = sanitizeString($appointmentRaw);
+  } else {
+    $submitMessage = 'Un des champs est érroné ...';
+  }
   // Envoie le tableau des valeurs pour le valider
-  if (count($appointmentSanitized) === 3) {
+  if ($submitMessage === 'ERROR' && ! in_array(null, $appointmentSanitized, true)) {
     $appointmentValidated = validateString($appointmentSanitized);
   } else {
     $submitMessage = 'Un des champs est érroné ...';
   }
   // Si toutes les valeurs sont bonnes, valide l'envoi
-  if (in_array(null, $appointmentValidated, true)) {
+  if ($submitMessage === 'ERROR' && ! in_array(null, $appointmentValidated, true)) {
     $submitMessage = 'Un des champs est érroné ...';
   } else {
     $formValidity = true;
   }
-  if ($formValidity === true) {
+  if ($formValidity) {
     // Concatène la date et les heures
     $dateHourString = $appointmentValidated[1] . ' ' . $appointmentValidated[2];
     // Déclare la date au format optimal pour SQL
@@ -54,6 +61,13 @@ if (isset($_GET['submit']) && $_SERVER['REQUEST_METHOD'] === 'GET') {
     }
   }
 }
+////////////////////////// EXERCICE 6 //////////////////////////
+// Déclaration de la requête SQL pour afficher la date, l'heure et le patient du rendez vous
+$query = 'SELECT `dateHour`, `idPatients` FROM `appointments`';
+// Envoie de la requête vers la base de données
+$appointmentsListQuery = $database->query($query);
+// Collection des données dans un tableau associatif (FETCH_ASSOC)
+$appointmentsList = $appointmentsListQuery->fetchAll(PDO::FETCH_ASSOC);
 ?>
 <!DOCTYPE html>
 <html lang="fr" dir="ltr">

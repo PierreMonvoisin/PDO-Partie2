@@ -16,20 +16,26 @@ $formValidity = false;
 // Collection des données dans un tableau associatif (FETCH_ASSOC)
 $patientsList = $patientsListQuery->fetchAll(PDO::FETCH_ASSOC);
 if (isset($_GET['submit']) && $_SERVER['REQUEST_METHOD'] === 'GET') {
-  $patientId = $_GET['patient'];
-  $date = $_GET['year'] . '-' . $_GET['month'] . '-' . $_GET['day'];
+  empty($_GET['patient']) ? $patientId = null : $patientId = $_GET['patient'];
+  empty($_GET['year']) ||  empty($_GET['month']) || empty($_GET['day'])? $date = null : $date = $_GET['year'] . '-' . $_GET['month'] . '-' . $_GET['day'];
+  empty($_GET['year']) ||  empty($_GET['month']) || empty($_GET['day'])? $dateFrench = null :
   $dateFrench = $_GET['day'] . '-' . $_GET['month'] . '-' . $_GET['year'];
-  $hour = $_GET['hour'];
+  empty($_GET['hour']) ? $hour = null : $hour = $_GET['hour'];
   $appointmentRaw = [$patientId, $date, $hour];
-  $appointmentSanitized = sanitizeString($appointmentRaw);
+  // Envoie le tableau des valeurs pour le nettoyer
+  if (! in_array(null, $appointmentRaw, true)) {
+    $appointmentSanitized = sanitizeString($appointmentRaw);
+  } else {
+    $submitMessage = 'Un des champs est érroné ...';
+  }
   // Envoie le tableau des valeurs pour le valider
-  if (count($appointmentSanitized) === 3) {
+  if ($submitMessage === 'ERROR' && ! in_array(null, $appointmentSanitized, true)) {
     $appointmentValidated = validateString($appointmentSanitized);
   } else {
     $submitMessage = 'Un des champs est érroné ...';
   }
   // Si toutes les valeurs sont bonnes, valide l'envoi
-  if (in_array(null, $appointmentValidated, true)) {
+  if ($submitMessage === 'ERROR' && in_array(null, $appointmentValidated, true)) {
     $submitMessage = 'Un des champs est érroné ...';
   } else {
     $formValidity = true;
