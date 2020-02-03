@@ -50,7 +50,6 @@ if (isset($_POST['submit']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
       // Execute la requête avec les variables en paramètres
       $stmt->execute([$stmtParam['firstname'], $stmtParam['lastname'], $stmtParam['birthdate'], $stmtParam['phoneNumber'], $stmtParam['Email']]);
       // Réinitialise la requête
-      $stmt = null;
       $submitMessage = 'Vos modifications sont bien enregistrées !';
       $queryStatus = true;
     } catch (PDOException $e) {
@@ -64,6 +63,15 @@ if (isset($_POST['submit']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
     $patientInfo = $patientInfoQuery->fetchAll(PDO::FETCH_ASSOC);
   }
 }
+////////////////////////// Exercice 9 //////////////////////////
+$query = 'SELECT `appointments`.`id` `idRDV`, `appointments`.`dateHour` `dateRDV`, `patients`.`firstname` `patientFirstname`, `patients`.`lastname` `patientLastname`, `patients`.`phone` `patientPhone`, `patients`.`mail` `patientMail`
+FROM `appointments`
+INNER JOIN `patients` ON `appointments`.`idPatients` = `patients`.`id`
+WHERE `patients`.`lastname` = "' . $patientLastName . '"';
+// Envoie de la requête vers la base de données
+$rdvInfoListQuery = $database->query($query);
+// Collection des données dans un tableau associatif (FETCH_ASSOC)
+$rdvInfoList = $rdvInfoListQuery->fetchAll(PDO::FETCH_ASSOC);
 ?>
 <!DOCTYPE html>
 <html lang="fr" dir="ltr">
@@ -80,6 +88,7 @@ if (isset($_POST['submit']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
 <body class="container-fluid p-0 bg-secondary">
 <?php include 'header.php' ?>
 <div class="jumbotron pt-4 my-5 bg-success mx-auto shadow">
+  <h1 class="text-center">Informations du patient</h1>
   <?php if ($queryStatus === true) { ?>
       <!--Ajoute un message à l'envoi du formulaire-->
       <h2 class="text-center my-2"><?= $submitMessage ?></h2>
@@ -92,7 +101,7 @@ if (isset($_POST['submit']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
             <th>Date de naissance</th>
             <th>Téléphone portable</th>
             <th>Adresse mail</th>
-            <th>Modification</th>
+            <th>Modifier</th>
         </tr>
         </thead>
         <tbody>
@@ -111,6 +120,36 @@ if (isset($_POST['submit']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
         <?php } ?>
         </tbody>
     </table>
+    <?php if (count($rdvInfoList) != 0) { ?>
+      <h1 class="text-center my-2">Liste des rendez-vous</h1>
+      <table class="table mt-3 text-center table-striped table-bordered table-hover">
+          <thead>
+          <tr class="text-white">
+            <th>Nom et prénom du patient</th>
+            <th>Mail</th>
+            <th>Téléphone</th>
+            <th>Date du RDV</th>
+            <th>Heure du RDV</th>
+          </tr>
+          </thead>
+          <tbody>
+          <?php foreach ($rdvInfoList as $info) {
+            $dateObject = new DateTime($info['dateRDV']);
+            $info['dateRDV'] = $dateObject->format('d/m/Y H:i');
+            $dateHourSeparation = explode(' ', $info['dateRDV']);
+            $day = $dateHourSeparation[0];
+            $hour = $dateHourSeparation[1]; ?>
+              <tr id="<?= $info['patientLastname']. ' ' .$info['patientFirstname'] ?>">
+                <td class="text-white"><?= $info['patientFirstname']. ' ' .$info['patientLastname'] ?></td>
+                <td class="text-white"><?= $info['patientMail'] ?></td>
+                <td class="text-white"><?= $info['patientPhone'] ?></td>
+                <td class="text-white"><?= $day ?></td>
+                <td class="text-white"><?= $hour ?></td>
+              </tr>
+            <?php } ?>
+          </tbody>
+      </table>
+    <?php } ?>
 </div>
 <!--Au clique du bouton, afficher le jumbotron avec le formulaire pour modifier les données-->
 <?php if (!empty($_GET['modify']) && $_GET['modify'] === 'on') { ?>

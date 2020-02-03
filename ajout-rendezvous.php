@@ -62,12 +62,22 @@ if (isset($_GET['submit']) && $_SERVER['REQUEST_METHOD'] === 'GET') {
   }
 }
 /////////////////////////////////// Exercice 6 ///////////////////////////////////
-// Déclaration de la requête SQL pour afficher les noms et prénoms des clients et les rendez vous associers
-$query = 'SELECT `appointments`.`dateHour` `dateRDV`, `patients`.`firstname` `patientFirstname`, `patients`.`lastname` `patientLastname`, `patients`.`mail` `patientMail` FROM `appointments` INNER JOIN `patients` ON `appointments`.`idPatients` = `patients`.`id`';
+// Déclaration de la requête SQL pour afficher les noms et prénoms des clients et les rendez vous associés
+$query = 'SELECT `appointments`.`id` `idRDV`, `appointments`.`dateHour` `dateRDV`, `patients`.`firstname` `patientFirstname`, `patients`.`lastname` `patientLastname`, `patients`.`mail` `patientMail`
+FROM `appointments`
+INNER JOIN `patients` ON `appointments`.`idPatients` = `patients`.`id`';
 // Envoie de la requête vers la base de données
 $rdvInfoListQuery = $database->query($query);
 // Collection des données dans un tableau associatif (FETCH_ASSOC)
 $rdvInfoList = $rdvInfoListQuery->fetchAll(PDO::FETCH_ASSOC);
+/////////////////////////////////// Exercice 10 ///////////////////////////////////
+if (! empty($_GET['deleteDayId']) && ! empty($_GET['deleteDay'])){
+  $deleteDayID = $_GET['deleteDayId'];
+  $deleteDay = strtotime($_GET['deleteDay']);
+  $stmt = $database->prepare('DELETE FROM `appointments` WHERE `id` = ? AND `dateHour` = ?');
+  $stmt->execute([$deleteDayID, $deleteDay]);
+  $stmt = null;
+}
 ?>
 <!DOCTYPE html>
 <html lang="fr" dir="ltr">
@@ -87,31 +97,33 @@ $rdvInfoList = $rdvInfoListQuery->fetchAll(PDO::FETCH_ASSOC);
       <div id="listRDV">
         <h2 class="text-center text-white py-3">Liste des Rendez-Vous</h2>
         <table class="table text-center table-striped table-bordered table-hover">
-            <thead>
+          <thead>
             <tr class="text-white">
-                <th>Nom et prénom du patient</th>
-                <th>Mail</th>
-                <th>Date</th>
-                <th>Heure</th>
-                <td>Informations</td>
+              <th>Nom et prénom du patient</th>
+              <th>Mail</th>
+              <th>Date</th>
+              <th>Heure</th>
+              <td>Informations</td>
+              <td>Supprimer</td>
             </tr>
-            </thead>
-            <tbody>
-              <?php foreach ($rdvInfoList as $info){
-                $dateObject = new DateTime($info['dateRDV']);
-                $info['dateRDV'] = $dateObject->format('d/m/Y H:i');
-                $dateHourSeparation = explode(' ', $info['dateRDV']);
-                $day = $dateHourSeparation[0];
-                $hour = $dateHourSeparation[1]; ?>
-            <tr id="<?= $info['patientLastname'] ?>">
+          </thead>
+          <tbody>
+            <?php foreach ($rdvInfoList as $info){
+              $dateObject = new DateTime($info['dateRDV']);
+              $info['dateRDV'] = $dateObject->format('d/m/Y H:i');
+              $dateHourSeparation = explode(' ', $info['dateRDV']);
+              $day = $dateHourSeparation[0];
+              $hour = $dateHourSeparation[1]; ?>
+              <tr id="<?= $info['patientLastname'] ?>">
                 <td class="text-white"><?= $info['patientLastname']. ' ' .$info['patientFirstname'] ?></td>
                 <td class="text-white"><?= $info['patientMail'] ?></td>
                 <td class="text-white"><?= $day ?></td>
                 <td class="text-white"><?= $hour ?></td>
                 <td><a class="text-white" href="rendezvous.php?patient=<?= $info['patientLastname'] ?>">Consulter</a></td>
-            </tr>
+                <td class="text-white"><a class="text-white" href="ajout-rendezvous.php?patient=<?= $info['patientLastname'] ?>&deleteDayId=<?= $info['idRDV'] ?>&deleteDay=<?= $dateObject->format('Y-m-d H:i:s') ?>">X</a></td>
+              </tr>
             <?php } ?>
-            </tbody>
+          </tbody>
         </table>
         <form class="d-flex" action="ajout-rendezvous.php?RDV=" method="post">
           <input class="mx-auto" type="submit" name="RDV" value="Ajouter un rendez-vous"></input>

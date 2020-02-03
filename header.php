@@ -14,7 +14,7 @@
     </li>
     <li class="nav-item">
       <!--      Lien vers la création d'un nouveau rendez-vous -->
-      <a class="nav-link bg-dark active" href="ajout-rendezvous.php">Ajouter un rendez-vous</a>
+      <a class="nav-link bg-dark active" href="ajout-rendezvous.php">Voir la liste des rendez-vous</a>
     </li>
   </ul>
 </header>
