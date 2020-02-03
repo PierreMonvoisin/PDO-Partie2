@@ -43,25 +43,6 @@ if (isset($_POST['submit']) && $_SERVER['REQUEST_METHOD'] === 'POST'){
   } else {
     $formValidity = true;
   }
-  if ($formValidity === true) {
-    // Concatène la date et les heures
-    $dateHourString = $modificationValidated[0] . ' ' . $modificationValidated[1];
-    // Déclare la date au format optimal pour SQL
-    $dateHour = date('Y-m-d H:i', strtotime($dateHourString));
-    // Réorganisation du tableau pour une meilleure utilisation
-    $stmtParam = ['dateHour' => $dateHour];
-    try {
-      // Déclaration de la requête SQL avec paramètres
-      $stmt = $database->prepare('UPDATE `appointments` SET `dateHour` = ? WHERE `id` ='.$idRDV);
-      // Execute la requête avec les variables en paramètres
-      $stmt->execute([$stmtParam['dateHour']]);
-      // Réinitialise la requête
-      $stmt = null;
-      $submitMessage = 'Rendez vous bien enregistré !';
-    } catch (PDOException $e) {
-      echo $$query . '/' . $e->getMessage();
-    }
-  }
 }
 ?>
 <!DOCTYPE html>
@@ -100,7 +81,7 @@ if (isset($_POST['submit']) && $_SERVER['REQUEST_METHOD'] === 'POST'){
           $dateObject = new DateTime($info['dateRDV']);
           $birthdateObject = new DateTime($info['patientBirthdate']);
           $info['dateRDV'] = $dateObject->format('d/m/Y H:i');
-          $info['patientBirthdate'] = $birthdateObject->format('d / m / Y');
+          $info['patientBirthdate'] = $birthdateObject->format('d/m/Y');
           $dateHourSeparation = explode(' ', $info['dateRDV']);
           $day = $dateHourSeparation[0];
           $hour = $dateHourSeparation[1]; ?>
@@ -113,7 +94,26 @@ if (isset($_POST['submit']) && $_SERVER['REQUEST_METHOD'] === 'POST'){
               <td><?= $hour ?></td>
               <td><a class="text-white" href="rendezvous.php?patient=<?= $info['patientLastname'] ?>&modify=on">Modifier</a></td>
             </tr>
-        <?php } ?>
+        <?php }
+        if ($formValidity === true) {
+          // Concatène la date et les heures
+          $dateHourString = $modificationValidated[0] . ' ' . $modificationValidated[1];
+          // Déclare la date au format optimal pour SQL
+          $dateHour = date('Y-m-d H:i', strtotime($dateHourString));
+          // Réorganisation du tableau pour une meilleure utilisation
+          $stmtParam = ['dateHour' => $dateHour];
+          try {
+            // Déclaration de la requête SQL avec paramètres
+            $stmt = $database->prepare('UPDATE `appointments` SET `dateHour` = ? WHERE `id` ='.$idRDV);
+            // Execute la requête avec les variables en paramètres
+            $stmt->execute([$stmtParam['dateHour']]);
+            // Réinitialise la requête
+            $stmt = null;
+            $submitMessage = 'Rendez vous bien enregistré !';
+          } catch (PDOException $e) {
+            echo $$query . '/' . $e->getMessage();
+          }
+        } ?>
         </tbody>
     </table>
 </div>

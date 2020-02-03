@@ -1,7 +1,7 @@
 <?php
 // Fonction de nettoyage des valeurs
 function sanitizeString($array) {
-  $array[0] = filter_var($array[1], FILTER_SANITIZE_STRING);
+  $array[0] = filter_var($array[0], FILTER_SANITIZE_STRING);
   $array[1] = filter_var($array[1], FILTER_SANITIZE_STRING);
   return $array;
 }
