@@ -68,7 +68,6 @@ $query = 'SELECT `appointments`.`dateHour` `dateRDV`, `patients`.`firstname` `pa
 $rdvInfoListQuery = $database->query($query);
 // Collection des données dans un tableau associatif (FETCH_ASSOC)
 $rdvInfoList = $rdvInfoListQuery->fetchAll(PDO::FETCH_ASSOC);
-var_dump($rdvInfoList);
 ?>
 <!DOCTYPE html>
 <html lang="fr" dir="ltr">
@@ -86,7 +85,32 @@ var_dump($rdvInfoList);
   <div class="jumbotron pt-4 my-5 mx-auto bg-primary w-50 shadow">
     <?php if (! isset($_POST['RDV'])) { ?>
       <div id="listRDV">
-        <h2 class="text-center text-white">Liste des Rendez-Vous</h2>
+        <h2 class="text-center text-white py-3">Liste des Rendez-Vous</h2>
+        <table class="table text-center table-striped table-bordered table-hover">
+            <thead>
+            <tr class="text-white">
+                <th>Nom et prénom du patient</th>
+                <th>Mail</th>
+                <th>Date</th>
+                <th>Heure</th>
+            </tr>
+            </thead>
+            <tbody>
+              <?php foreach ($rdvInfoList as $info){
+                $dateObject = new DateTime($info['dateRDV']);
+                $info['dateRDV'] = $dateObject->format('d/m/Y H:i');
+                $dateHourSeparation = explode(' ', $info['dateRDV']);
+                $day = $dateHourSeparation[0];
+                $hour = $dateHourSeparation[1]; ?>
+            <tr id="<?= $info['patientLastname'] ?>">
+                <td class="text-white"><?= $info['patientLastname']. ' ' .$info['patientFirstname'] ?></td>
+                <td class="text-white"><?= $info['patientMail'] ?></td>
+                <td class="text-white"><?= $day ?></td>
+                <td class="text-white"><?= $hour ?></td>
+            </tr>
+            <?php } ?>
+            </tbody>
+        </table>
       </div>
     <?php } else { ?>
       <div id="dateSelector">
