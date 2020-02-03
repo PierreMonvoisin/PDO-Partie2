@@ -93,6 +93,7 @@ $rdvInfoList = $rdvInfoListQuery->fetchAll(PDO::FETCH_ASSOC);
                 <th>Mail</th>
                 <th>Date</th>
                 <th>Heure</th>
+                <td>Informations</td>
             </tr>
             </thead>
             <tbody>
@@ -107,10 +108,14 @@ $rdvInfoList = $rdvInfoListQuery->fetchAll(PDO::FETCH_ASSOC);
                 <td class="text-white"><?= $info['patientMail'] ?></td>
                 <td class="text-white"><?= $day ?></td>
                 <td class="text-white"><?= $hour ?></td>
+                <td><a class="text-white" href="rendezvous.php?patient=<?= $info['patientLastname'] ?>">Consulter</a></td>
             </tr>
             <?php } ?>
             </tbody>
         </table>
+        <form class="d-flex" action="ajout-rendezvous.php?RDV=" method="post">
+          <input class="mx-auto" type="submit" name="RDV" value="Ajouter un rendez-vous"></input>
+        </form>
       </div>
     <?php } else { ?>
       <div id="dateSelector">
