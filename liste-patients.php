@@ -3,11 +3,23 @@
 require_once 'connection.php';
 $database = connectionToDatabase();
 // Déclaration de la requête SQL pour afficher les noms et prénoms des clients
-$query = 'SELECT `firstname`, `lastname` FROM `patients` ORDER BY `lastname` ASC';
+$query = 'SELECT `id`, `firstname`, `lastname` FROM `patients` ORDER BY `lastname` ASC';
 // Envoie de la requête vers la base de données
 $patientsListQuery = $database->query($query);
 // Collection des données dans un tableau associatif (FETCH_ASSOC)
-$patientsList = $patientsListQuery->fetchAll(PDO::FETCH_ASSOC); ?>
+$patientsList = $patientsListQuery->fetchAll(PDO::FETCH_ASSOC);
+///////////////////////// Exercice 11 /////////////////////////
+if (! empty($_GET['deletePatient']) && ! empty($_GET['patientId'])) {
+  $patientId = $_GET['patientId'];
+  $patientLastname = $_GET['deletePatient'];
+  $stmt = $database->prepare('DELETE FROM `patients` WHERE `id` = ? AND `lastname` = ?');
+  $stmt->execute([$patientId, $patientLastname]);
+  $stmt = $database->prepare('DELETE FROM `appointments` WHERE `idPatients` = ?');
+  $stmt->execute([$patientId]);
+  $stmt = null;
+  header("Refresh:0; url=liste-patients.php");
+}
+?>
 <!DOCTYPE html>
 <html lang="fr" dir="ltr">
 <head>
@@ -29,6 +41,7 @@ $patientsList = $patientsListQuery->fetchAll(PDO::FETCH_ASSOC); ?>
             <th>Nom de famille</th>
             <th>Prénom</th>
             <th>Profil</th>
+            <th>Supprimer</th>
         </tr>
         </thead>
         <tbody>
@@ -39,6 +52,7 @@ $patientsList = $patientsListQuery->fetchAll(PDO::FETCH_ASSOC); ?>
             <td><?= $patient['firstname'] ?></td>
 <!--            Ajoute un lien vers le profil du patient-->
             <td><a href="profil-patient.php?patient=<?= $patient['lastname'] ?>" class="text-white">Afficher</a></td>
+            <td><a href="liste-patients.php?deletePatient=<?= $patient['lastname'] ?>&patientId=<?= $patient['id'] ?>" class="text-white">X</a></td>
         </tr>
         <?php } ?>
         </tbody>
