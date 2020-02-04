@@ -73,7 +73,7 @@ $rdvInfoList = $rdvInfoListQuery->fetchAll(PDO::FETCH_ASSOC);
 /////////////////////////////////// Exercice 10 ///////////////////////////////////
 if (! empty($_GET['deleteDayId']) && ! empty($_GET['deleteDay'])){
   $deleteDayID = $_GET['deleteDayId'];
-  $deleteDay = strtotime($_GET['deleteDay']);
+  $deleteDay = $_GET['deleteDay'];
   $stmt = $database->prepare('DELETE FROM `appointments` WHERE `id` = ? AND `dateHour` = ?');
   $stmt->execute([$deleteDayID, $deleteDay]);
   $stmt = null;
@@ -93,9 +93,13 @@ if (! empty($_GET['deleteDayId']) && ! empty($_GET['deleteDay'])){
 <body class="container-fluid bg-secondary p-0">
   <?php include 'header.php' ?>
   <div class="jumbotron pt-4 my-5 mx-auto bg-primary w-50 shadow">
-    <?php if (! isset($_POST['RDV'])) { ?>
+    <?php if (! isset($_GET['RDV'])) { ?>
       <div id="listRDV">
         <h2 class="text-center text-white py-3">Liste des Rendez-Vous</h2>
+        <?php if (isset($_GET['submit'])) { ?>
+          <!--   Ajoute un message à la validation du formulaire-->
+          <h3 class="text-center text-white"><?= $submitMessage ?></h3>
+        <?php } ?>
         <table class="table text-center table-striped table-bordered table-hover">
           <thead>
             <tr class="text-white">
@@ -120,7 +124,7 @@ if (! empty($_GET['deleteDayId']) && ! empty($_GET['deleteDay'])){
                 <td class="text-white"><?= $day ?></td>
                 <td class="text-white"><?= $hour ?></td>
                 <td><a class="text-white" href="rendezvous.php?patient=<?= $info['patientLastname'] ?>">Consulter</a></td>
-                <td class="text-white"><a class="text-white" href="ajout-rendezvous.php?patient=<?= $info['patientLastname'] ?>&deleteDayId=<?= $info['idRDV'] ?>&deleteDay=<?= $dateObject->format('Y-m-d H:i:s') ?>">X</a></td>
+                <td class="text-white"><a class="text-white" href="ajout-rendezvous.php?patient=<?= $info['patientLastname'] ?>&deleteDayId=<?= $info['idRDV'] ?>&deleteDay=<?= $dateObject->format('Y-m-d H:i') ?>">X</a></td>
               </tr>
             <?php } ?>
           </tbody>
@@ -132,10 +136,6 @@ if (! empty($_GET['deleteDayId']) && ! empty($_GET['deleteDay'])){
     <?php } else { ?>
       <div id="dateSelector">
         <h2 class="text-center text-white">Choississez la date du rendez vous</h2>
-        <?php if ($formValidity) { ?>
-          <!--   Ajoute un message à la validation du formulaire-->
-          <h3 class="text-center text-white"><?= $submitMessage ?></h3>
-        <?php } ?>
         <form class="form-group w-50 mx-auto" action="ajout-rendezvous.php" method="get">
           <div class="form-group row d-flex">
             <label for="patient" class="mr-auto my-auto font-weight-bold text-white">Choisissez le patient :</label>

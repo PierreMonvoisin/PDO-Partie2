@@ -19,7 +19,7 @@ $rdvInfoList = $rdvInfoListQuery->fetchAll(PDO::FETCH_ASSOC);
 
 /////////////// Récupération des informations du formulaire ///////////////
 // Importe les fonctions de nettoyage et validation des valeurs
-include 'input-cleaning-rendezvous.php';
+include 'input-cleaning-rendezvous-modif.php';
 $message = 'ERROR';
 $formValidity = false;
 if (isset($_POST['submit']) && $_SERVER['REQUEST_METHOD'] === 'POST'){
