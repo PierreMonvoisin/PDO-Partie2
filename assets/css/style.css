@@ -1,0 +1,16 @@
+/*body{
+    background: url(../img/img-fond.jpg);
+}*/
+h1, h2{
+    text-align: center;
+}
+#suggestBox{
+    width: 57%;
+    position: relative;
+}
+.list-group{
+    position: absolute;
+    left: 0;
+    z-index: 1000;
+    /*display: none;*/
+}

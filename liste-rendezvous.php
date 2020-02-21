@@ -1,24 +1,22 @@
-
 <?php
 require 'params.php';
 $db = connectDb();
-$db->exec("SET CHARACTER SET utf8");
-// variable pour afficher les données souhaité d'une table
-$sql = 'SELECT `id`, `lastname`, `firstname`, `birthdate`, `phone`, `mail` FROM `patients` LIMIT 50';
+$query ='SELECT `patients`.`id`, `lastname`, `firstname`, DATE_FORMAT(`dateHour`, \'%d/%m/%Y %H:%i:%s\') `dateHour` from `patients`, `appointments` WHERE `patients`.`id` = `appointments`.`idPatients`';
 // Envoie de la requête vers la base de données
-$usersQueryStat = $db->query($sql);
-$usersList = [];
-if ($usersQueryStat instanceOf PDOStatement) {
+$usersQueryState = $db->query($query);
+$appointmentsList = [];
+if ($usersQueryState instanceOf PDOStatement) {
   // Collection des données dans un tableau associatif (FETCH_ASSOC)
-  $usersList = $usersQueryStat->fetchAll(PDO::FETCH_ASSOC);
+  $appointmentsList = $usersQueryState->fetchAll(PDO::FETCH_OBJ);
 }
-?><!DOCTYPE html>
+?>
+<!DOCTYPE html>
 <html lang="fr">
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta http-equiv="X-UA-Compatible" content="ie=edge">
-        <title>Clinique Montaigu - Liste des patients</title>
+        <title>Clinique Montaigu - Liste des rendez-vous</title>
         <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
         <link rel="stylesheet" media="screen" type="text/css" title="Mon style" href="assets/css/style.css"/>   
     </head>
@@ -27,32 +25,26 @@ if ($usersQueryStat instanceOf PDOStatement) {
             <div class="row">
                 <div class="card col-sm-12 bg-light">
                     <div class="card-header font-bold bg-info"><h1>Clinique Montaigu</h1></div>
-                    <h2>Liste des patients</h2>
+                    <h2>Liste des rendez-vous</h2>
                     <table class="table table-bordered">
-                        <thead>
+                    <thead>
                             <tr>
                             <th>0</th>
                             <th>Nom</th>
                             <th>Prénom</th>
-                            <th>Date d'anniversaire</th>
-                            <th>Télephone</th>
-                            <th>Email</th>
-                            <th>Informations</th>
+                            <th>Date de rendez-vous</th>
                             </tr>
                         </thead>
                         <tbody>
                         <?php
-                        if (count($usersList) > 0) {
-                        foreach ($usersList AS $key => $user){
+                        if (count($appointmentsList) > 0) {
+                        foreach ($appointmentsList AS $key => $appointment){
                         ?>
                         <tr>
                             <td><?= $key + 1 ?></td>
-                            <td><a href="profil-patient.php?idPatient=<?= $user['id'] ?>"><?= $user['lastname'] ?></a></td>
-                            <td><?= $user['firstname']?></td>
-                            <td><?= $user['birthdate']?></td>
-                            <td><?= $user['phone']?></td>
-                            <td><?= $user['mail']?></td>
-                            <td><a href="profil-patient.php?idPatient=<?= $user['id'] ?>">page profil</a></td>
+                            <td><?= $appointment->lastname ?></a></td>
+                            <td><?= $appointment->firstname ?></td>
+                            <td><?= $appointment->dateHour ?></td>
                         </tr>
                         <?php
                         }
@@ -60,8 +52,11 @@ if ($usersQueryStat instanceOf PDOStatement) {
                         ?>
                     </tbody>
                         </table>
-                        <a class="btn btn-warning" href="ajout-patient.php">Créer un patient</a>
-                        <a class="btn btn-dark" href="index.php">Accueil</a>
-                    </div>
+                    </table>
+                    <div class="btn  btn-warning col-sm-5"><a href="ajout-rendezvous.php" title="Ajouter un rendez-vous">Ajouter un rendez-vous</a></div>
+                    <div class="btn  btn-black col-sm-5"><a href="index.php" title="Accueil">Accueil</a></div>
                 </div>
             </div>
+        </div>
+    </body>
+</html>
